@@ -16,6 +16,7 @@ Windows 图文阅读器，支持文字、电子书、PDF 和漫画压缩包的�
 
 - 阅读 TXT、EPUB、PDF 文件。
 - 阅读 ZIP、CBZ、RAR、CBR、7Z、CB7 漫画压缩包。
+- 显示压缩包内的 JPG、JPEG、PNG、GIF、WEBP、BMP、AVIF 图片。
 - 管理多个书库和合集，扫描文件夹或单个文件。
 - 保存阅读进度、阅读历史、点赞和阅读状态。
 - 选择 TXT 文本编码，支持 PDF 分段读取和 EPUB 流式读取。
