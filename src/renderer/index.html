@@ -1,0 +1,281 @@
+<!doctype html>
+<html lang="zh-CN">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <meta http-equiv="Content-Security-Policy" content="default-src 'self' blob: data:; script-src 'self'; style-src 'self' 'unsafe-inline'; img-src 'self' blob: data:; font-src 'self' data:; connect-src 'none'; frame-src 'self' blob: data:; worker-src 'self' blob:; object-src 'none'; base-uri 'none'; form-action 'none'">
+  <title>图文阅读器</title>
+</head>
+<body>
+  <div id="app" class="app-shell">
+    <header class="topbar">
+      <div class="brand">
+        <span class="brand-mark"><img src="../build/icon.png" alt="" aria-hidden="true"></span>
+        <div>
+          <h1>图文阅读器</h1>
+          <p id="scanStatus">正在准备书库</p>
+        </div>
+      </div>
+      <div class="topbar-actions">
+        <button id="themeToggle" class="topbar-button theme-button" type="button"><i data-lucide="sun"></i><span id="themeToggleLabel">亮色模式</span></button>
+        <div class="strategy-control">
+          <button id="strategyBtn" class="topbar-button" type="button" aria-haspopup="true" aria-expanded="false"><i data-lucide="shuffle"></i><span>随机策略</span></button>
+          <div id="strategyMenu" class="strategy-menu hidden" role="radiogroup" aria-label="随机策略">
+            <button type="button" data-strategy="default" role="radio" aria-checked="true">默认随机</button>
+            <button type="button" data-strategy="likes" role="radio" aria-checked="false">点赞优先</button>
+            <button type="button" data-strategy="short" role="radio" aria-checked="false">短篇优先</button>
+          </div>
+        </div>
+        <button id="favoritesBtn" class="topbar-button" type="button"><i data-lucide="chart-no-axes-column-increasing"></i><span>榜单</span></button>
+        <button id="exportBtn" class="topbar-button" type="button"><i data-lucide="download"></i><span>备份</span></button>
+        <button id="importBtn" class="topbar-button" type="button"><i data-lucide="archive-restore"></i><span>恢复</span></button>
+        <button id="dataFolderBtn" class="topbar-button" type="button"><i data-lucide="settings"></i><span>配置路径</span></button>
+        <button id="initializeBtn" class="topbar-button danger-text" type="button"><i data-lucide="rotate-ccw"></i><span>初始化</span></button>
+      </div>
+    </header>
+
+    <div class="workspace">
+      <aside id="sidebar" class="sidebar">
+        <div class="sidebar-heading">
+          <span>合集</span>
+          <button id="addCollectionBtn" class="icon-btn small" type="button" title="新建合集" aria-label="新建合集"><i data-lucide="folder-plus"></i></button>
+        </div>
+        <nav id="collectionList" class="collection-list" aria-label="合集列表"></nav>
+      </aside>
+
+      <main class="library-main">
+        <section class="library-toolbar">
+          <div class="collection-title-wrap">
+            <p class="eyebrow">当前合集</p>
+            <div class="title-line">
+              <h2 id="activeCollectionName">尚未选择</h2>
+              <span id="collectionCount" class="count-label">0 本</span>
+            </div>
+          </div>
+          <div class="primary-actions">
+            <button id="sidebarToggle" class="icon-btn" type="button" title="隐藏合集栏" aria-label="隐藏合集栏"><i data-lucide="panel-left-close"></i></button>
+            <button id="addRootsBtn" class="icon-btn" type="button" title="增补目录" aria-label="增补目录" disabled><i data-lucide="plus"></i></button>
+            <button id="refreshBtn" class="icon-btn" type="button" title="刷新合集" aria-label="刷新合集" disabled><i data-lucide="rotate-cw"></i></button>
+            <button id="editCollectionBtn" class="icon-btn" type="button" title="编辑合集" aria-label="编辑合集" disabled><i data-lucide="pencil"></i></button>
+            <button id="deleteCollectionBtn" class="icon-btn danger" type="button" title="删除合集" aria-label="删除合集" disabled><i data-lucide="trash-2"></i></button>
+            <button id="drawBtn" class="command-btn primary" type="button" disabled><i data-lucide="shuffle"></i><span>随机抽取</span></button>
+          </div>
+        </section>
+
+        <section class="library-controls">
+          <label class="search-box" for="searchInput">
+            <i data-lucide="search"></i>
+            <input id="searchInput" type="search" placeholder="搜索当前合集" autocomplete="off">
+          </label>
+          <div class="filter-tabs" role="tablist" aria-label="书籍筛选">
+            <button class="filter-tab active" type="button" data-filter="all">全部</button>
+            <button class="filter-tab" type="button" data-filter="unread">未读</button>
+            <button class="filter-tab" type="button" data-filter="comic">漫画</button>
+            <button class="filter-tab" type="button" data-filter="novel">小说</button>
+          </div>
+          <button id="resetPoolBtn" class="command-btn quiet" type="button" disabled><i data-lucide="undo-2"></i><span>重置</span></button>
+        </section>
+
+        <section id="bookArea" class="book-area">
+          <div id="emptyState" class="empty-state">
+            <span class="empty-visual"><i data-lucide="library-big"></i></span>
+            <h3>添加合集开始阅读</h3>
+            <button id="emptyAddBtn" class="command-btn primary" type="button"><i data-lucide="folder-plus"></i><span>新建合集</span></button>
+          </div>
+          <div id="bookTable" class="book-table hidden" role="list" aria-label="书籍列表">
+            <div id="bookRows" class="book-rows"></div>
+          </div>
+        </section>
+      </main>
+
+      <aside class="activity-panel">
+        <section class="activity-section history-section">
+          <div class="section-heading">
+            <h2>最近记录</h2>
+            <span>本次运行</span>
+          </div>
+          <div id="historyList" class="history-list">
+            <p class="muted-empty">暂无记录</p>
+          </div>
+        </section>
+      </aside>
+    </div>
+  </div>
+
+  <section id="readerOverlay" class="reader-overlay hidden" aria-label="阅读器">
+    <header id="readerToolbar" class="reader-toolbar">
+      <div class="reader-leading">
+        <button id="closeReaderBtn" class="icon-btn" type="button" title="返回书库" aria-label="返回书库"><i data-lucide="arrow-left"></i></button>
+        <div class="reader-title-wrap">
+          <h2 id="readerTitle"></h2>
+          <span id="readerMeta"></span>
+        </div>
+      </div>
+      <div class="reader-controls">
+        <div id="novelControl" class="novel-controls hidden" aria-label="阅读存档与小说显示设置">
+          <button id="eyeCareBtn" class="reader-action-button reader-novel-button" type="button" title="护眼模式" aria-label="护眼模式"><i data-lucide="sun"></i><span id="eyeCareLabel" class="responsive-label">护眼模式</span></button>
+          <button id="saveArchiveBtn" class="reader-action-button reader-novel-button" type="button" title="保存存档" aria-label="保存存档"><i data-lucide="bookmark-plus"></i><span class="responsive-label">存档</span></button>
+          <button id="loadArchiveBtn" class="reader-action-button reader-novel-button" type="button" title="读档" aria-label="读档"><i data-lucide="bookmark-check"></i><span class="responsive-label">读档</span></button>
+          <div class="font-controls" aria-label="字号调整">
+            <button id="fontDecreaseBtn" class="reader-icon-button" type="button" title="缩小字号" aria-label="缩小字号"><i data-lucide="minus"></i></button>
+            <span id="fontScaleLabel" class="font-scale-label">100%</span>
+            <button id="fontIncreaseBtn" class="reader-icon-button" type="button" title="放大字号" aria-label="放大字号"><i data-lucide="plus"></i></button>
+          </div>
+        </div>
+        <label id="encodingControl" class="select-control hidden">
+          <span>编码</span>
+          <select id="encodingSelect">
+            <option value="auto">自动</option>
+            <option value="utf8">UTF-8</option>
+            <option value="gb18030">GB18030/GBK</option>
+            <option value="big5">Big5</option>
+          </select>
+        </label>
+        <div id="modeControl" class="segmented hidden" aria-label="阅读模式">
+          <button type="button" data-reader-mode="continuous"><i data-lucide="rows-3"></i><span>连续</span></button>
+          <button type="button" data-reader-mode="page"><i data-lucide="square"></i><span>翻页</span></button>
+        </div>
+        <div id="fitControl" class="segmented hidden" aria-label="适配方式">
+          <button type="button" data-fit-mode="width">适宽</button>
+          <button type="button" data-fit-mode="height">适高</button>
+          <button type="button" data-fit-mode="fit">完整</button>
+        </div>
+        <div id="zoomControl" class="zoom-controls hidden" aria-label="漫画缩放">
+          <button id="zoomOutBtn" class="reader-icon-button" type="button" title="缩小页面" aria-label="缩小页面"><i data-lucide="zoom-out"></i></button>
+          <span id="zoomScaleLabel" class="zoom-scale-label">100%</span>
+          <button id="zoomInBtn" class="reader-icon-button" type="button" title="放大页面" aria-label="放大页面"><i data-lucide="zoom-in"></i></button>
+        </div>
+        <span class="reader-control-divider"></span>
+        <button id="showBookFolderBtn" class="reader-action-button icon-only" type="button" title="打开文件所在目录" aria-label="打开文件所在目录"><i data-lucide="folder-open"></i></button>
+        <button id="renameBookBtn" class="reader-action-button icon-only" type="button" title="重命名当前文件" aria-label="重命名当前文件"><i data-lucide="file-pen-line"></i></button>
+        <button id="trashBookBtn" class="icon-btn danger" type="button" title="删除当前文件" aria-label="删除当前文件"><i data-lucide="trash-2"></i></button>
+        <span class="reader-control-divider"></span>
+        <button id="likeBtn" class="icon-btn" type="button" title="点赞" aria-label="点赞"><i data-lucide="heart"></i><span id="readerLikeCount">0</span></button>
+        <button id="readerRandomBtn" class="reader-action-button primary" type="button"><i data-lucide="shuffle"></i><span>随机抽取</span></button>
+        <button id="quickGestureBtn" class="icon-btn" type="button" title="关闭快捷手势" aria-label="关闭快捷手势" aria-pressed="true"><i data-lucide="mouse-pointer-click"></i></button>
+        <button id="fullscreenBtn" class="icon-btn" type="button" title="全屏" aria-label="全屏"><i data-lucide="maximize-2"></i></button>
+      </div>
+    </header>
+    <div id="readerViewport" class="reader-viewport">
+      <div id="readerContent" class="reader-content"></div>
+      <div id="readerLoading" class="reader-loading hidden">
+        <span class="spinner"></span>
+        <p id="readerLoadingText">正在打开</p>
+      </div>
+    </div>
+    <footer id="pageNavigation" class="page-navigation hidden">
+      <button id="prevPageBtn" class="icon-btn" type="button" title="上一页" aria-label="上一页"><i data-lucide="chevron-left"></i></button>
+      <span id="pageCounter">1 / 1</span>
+      <button id="nextPageBtn" class="icon-btn" type="button" title="下一页" aria-label="下一页"><i data-lucide="chevron-right"></i></button>
+    </footer>
+    <aside id="archiveProgress" class="archive-progress hidden" aria-live="polite">
+      <div class="archive-progress-heading">
+        <span class="archive-progress-icon"><i data-lucide="archive"></i></span>
+        <div>
+          <strong>压缩包缓存</strong>
+          <span id="archiveProgressText">正在读取页面</span>
+        </div>
+        <span id="archiveProgressPercent">0%</span>
+      </div>
+      <div class="archive-progress-track"><span id="archiveProgressBar"></span></div>
+    </aside>
+  </section>
+
+  <dialog id="renameDialog" class="modal confirm-modal">
+    <form id="renameForm" method="dialog">
+      <header class="modal-header">
+        <h2>重命名文件</h2>
+        <button id="closeRenameDialog" class="icon-btn small" type="button" title="关闭" aria-label="关闭"><i data-lucide="x"></i></button>
+      </header>
+      <div class="modal-body">
+        <label class="field-label" for="renameInput">主文件名</label>
+        <div class="rename-input-row">
+          <input id="renameInput" class="text-input" maxlength="200" autocomplete="off" required>
+          <span id="renameExtension" class="extension-label"></span>
+        </div>
+        <p class="field-hint">扩展名保持不变</p>
+      </div>
+      <footer class="modal-footer">
+        <button id="cancelRenameBtn" class="command-btn quiet" type="button">取消</button>
+        <button id="saveRenameBtn" class="command-btn primary" type="submit"><i data-lucide="check"></i><span>确认重命名</span></button>
+      </footer>
+    </form>
+  </dialog>
+
+  <dialog id="collectionDialog" class="modal">
+    <form id="collectionForm" method="dialog">
+      <header class="modal-header">
+        <h2 id="collectionDialogTitle">新建合集</h2>
+        <button id="closeCollectionDialog" class="icon-btn small" type="button" title="关闭" aria-label="关闭"><i data-lucide="x"></i></button>
+      </header>
+      <div class="modal-body">
+        <label class="field-label" for="collectionNameInput">合集名称</label>
+        <input id="collectionNameInput" class="text-input" maxlength="80" autocomplete="off" required>
+        <div class="field-row">
+          <span class="field-label">文件或目录</span>
+          <div class="field-actions">
+            <button id="chooseFilesBtn" class="command-btn quiet" type="button"><i data-lucide="files"></i><span>选择文件</span></button>
+            <button id="chooseRootsBtn" class="command-btn quiet" type="button"><i data-lucide="folder-open"></i><span>选择目录</span></button>
+          </div>
+        </div>
+        <div id="selectedRoots" class="root-list"></div>
+      </div>
+      <footer class="modal-footer">
+        <button id="cancelCollectionBtn" class="command-btn quiet" type="button">取消</button>
+        <button id="saveCollectionBtn" class="command-btn primary" type="submit">保存合集</button>
+      </footer>
+    </form>
+  </dialog>
+
+  <dialog id="favoritesDialog" class="modal favorites-modal">
+    <header class="modal-header">
+      <h2>榜单</h2>
+      <button id="closeFavoritesDialog" class="icon-btn small" type="button" title="关闭" aria-label="关闭"><i data-lucide="x"></i></button>
+    </header>
+    <div class="favorites-body">
+      <section class="favorites-group">
+        <div class="section-heading"><h3>漫画榜</h3><span>前 10 名</span></div>
+        <div id="favoriteComicList" class="favorite-list"></div>
+      </section>
+      <section class="favorites-group">
+        <div class="section-heading"><h3>小说榜</h3><span>前 10 名</span></div>
+        <div id="favoriteNovelList" class="favorite-list"></div>
+      </section>
+    </div>
+  </dialog>
+
+  <dialog id="confirmDialog" class="modal confirm-modal">
+    <form method="dialog">
+      <header class="modal-header"><h2 id="confirmTitle">确认操作</h2></header>
+      <div class="modal-body"><p id="confirmMessage"></p></div>
+      <footer class="modal-footer">
+        <button id="confirmCancel" class="command-btn quiet" value="cancel">取消</button>
+        <button id="confirmAccept" class="command-btn danger-fill" value="accept">确认</button>
+      </footer>
+    </form>
+  </dialog>
+
+  <dialog id="renameRecoveryDialog" class="modal recovery-modal">
+    <header class="modal-header">
+      <h2 id="renameRecoveryTitle">检测到重命名冲突</h2>
+    </header>
+    <div class="modal-body">
+      <p id="renameRecoveryMessage">旧路径和新路径同时存在。请选择要关联阅读状态的路径；程序不会删除任一文件。</p>
+      <div id="renameRecoveryPaths" class="recovery-paths">
+        <div><span>旧路径</span><strong id="renameRecoveryOldPath"></strong></div>
+        <div><span>新路径</span><strong id="renameRecoveryNewPath"></strong></div>
+      </div>
+    </div>
+    <footer class="modal-footer recovery-actions">
+      <button id="renameRecoveryOldBtn" class="command-btn quiet" type="button">使用旧路径</button>
+      <button id="renameRecoveryNewBtn" class="command-btn primary" type="button">使用新路径</button>
+      <button id="renameRecoveryBothBtn" class="command-btn quiet" type="button">保留两者并重扫</button>
+      <button id="renameRecoveryDiscardBtn" class="command-btn primary hidden" type="button">清除无效记录并重扫</button>
+    </footer>
+  </dialog>
+
+  <div id="toastRegion" class="toast-region" aria-live="polite"></div>
+  <div id="dropOverlay" class="drop-overlay hidden" aria-hidden="true">松开以打开或创建合集</div>
+  <script type="module" src="/app.js"></script>
+</body>
+</html>

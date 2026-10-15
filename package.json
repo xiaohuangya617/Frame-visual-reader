@@ -1,0 +1,73 @@
+{
+  "name": "random-reader",
+  "version": "2.7.0",
+  "description": "完全离线的 Windows 图文阅读器",
+  "main": "src/main/main.cjs",
+  "type": "module",
+  "scripts": {
+    "generate:icon": "node scripts/generate-icon.cjs",
+    "postinstall": "node scripts/patch-pdfjs-worker.cjs",
+    "build:renderer": "node scripts/patch-pdfjs-worker.cjs && vite build",
+    "build:electron": "set \"ELECTRON_BUILDER_CACHE=%CD%\\.cache\\electron-builder\" && electron-builder --win dir --x64 --config.directories.output=release/%npm_package_version%",
+    "start": "npm run build:renderer && electron .",
+    "build": "npm run build:renderer && npm run build:electron",
+    "package:folder": "node scripts/package-folder.cjs --preflight && npm run build && node scripts/package-folder.cjs --existing",
+    "package:folder:existing": "node scripts/package-folder.cjs --existing"
+  },
+  "dependencies": {
+    "7zip-bin": "5.2.0",
+    "chardet": "2.2.0",
+    "epubjs": "0.3.93",
+    "iconv-lite": "0.7.3",
+    "lucide": "1.39.0",
+    "node-unrar-js": "2.0.2",
+    "pdfjs-dist": "6.3.289"
+  },
+  "devDependencies": {
+    "electron": "44.1.1",
+    "electron-builder": "26.15.3",
+    "vite": "8.2.2"
+  },
+  "overrides": {
+    "@xmldom/xmldom": "0.9.12"
+  },
+  "build": {
+    "appId": "local.apeiria.random-reader",
+    "productName": "图文阅读器",
+    "artifactName": "图文阅读器-${version}-文件夹版.${ext}",
+    "directories": {
+      "output": "release"
+    },
+    "files": [
+      "dist-renderer/**/*",
+      "src/main/**/*",
+      "src/preload/**/*",
+      "build/icon.png",
+      "build/icon.ico",
+      "package.json",
+      "!node_modules/@napi-rs/canvas{,/**/*}",
+      "!node_modules/@napi-rs/canvas-*/**/*",
+      "!node_modules/7zip-bin/linux/**/*",
+      "!node_modules/7zip-bin/mac/**/*",
+      "!node_modules/7zip-bin/win/ia32/**/*",
+      "!node_modules/7zip-bin/win/arm64/**/*"
+    ],
+    "asar": true,
+    "asarUnpack": [
+      "src/main/rar-worker.cjs",
+      "node_modules/node-unrar-js/**/*",
+      "node_modules/7zip-bin/win/x64/7za.exe"
+    ],
+    "win": {
+      "icon": "build/icon.ico",
+      "target": [
+        {
+          "target": "dir",
+          "arch": [
+            "x64"
+          ]
+        }
+      ]
+    }
+  }
+}

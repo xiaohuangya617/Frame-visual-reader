@@ -1,0 +1,93 @@
+<!doctype html>
+<html lang="zh-CN">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <style>
+    :root {
+      color-scheme: dark;
+      background: #101312;
+      color: #e8ece9;
+      --surface: #151918;
+      --line: #303833;
+      --muted: #98a39c;
+      --subtle: #6f7b74;
+      --accent: #71c58d;
+    }
+    :root[data-theme="light"] {
+      color-scheme: light;
+      background: #f2f4f3;
+      color: #17201a;
+      --surface: #ffffff;
+      --line: #d6ddd8;
+      --muted: #5f6e65;
+      --subtle: #7b8980;
+      --accent: #54ad72;
+    }
+    * { box-sizing: border-box; }
+    html, body { width: 100%; height: 100%; margin: 0; overflow: hidden; }
+    body {
+      display: grid;
+      place-items: center;
+      background: transparent;
+      font-family: "Microsoft YaHei UI", "Segoe UI", sans-serif;
+      letter-spacing: 0;
+      opacity: 1;
+      transform: scale(1);
+      transition: opacity 260ms ease, transform 260ms ease;
+      user-select: none;
+    }
+    body.closing { opacity: 0; transform: scale(.985); }
+    .splash {
+      width: 100%;
+      height: 100%;
+      padding: 28px 32px 25px;
+      display: grid;
+      grid-template-rows: 1fr auto;
+      border: 1px solid var(--line);
+      background: var(--surface);
+    }
+    .brand { align-self: center; display: grid; justify-items: center; gap: 14px; }
+    .brand-mark {
+      width: 54px;
+      height: 54px;
+      display: grid;
+      place-items: center;
+      border: 1px solid var(--accent);
+      border-radius: 8px;
+      color: #102116;
+      background: var(--accent);
+      overflow: hidden;
+    }
+    .brand-mark img { width: 100%; height: 100%; display: block; object-fit: cover; }
+    .brand h1 { margin: 0; font-size: 20px; font-weight: 720; }
+    .status { min-width: 0; }
+    .status-line { display: flex; align-items: center; justify-content: space-between; gap: 16px; color: var(--muted); font-size: 11px; }
+    #splashPercent { color: var(--accent); font-variant-numeric: tabular-nums; }
+    .progress-track { height: 5px; margin-top: 9px; overflow: hidden; border: 1px solid var(--line); border-radius: 3px; background: color-mix(in srgb, var(--surface) 70%, #000 30%); }
+    .progress-track span { display: block; width: 4%; height: 100%; background: var(--accent); transition: width 180ms ease-out; }
+  </style>
+</head>
+<body>
+  <main class="splash" aria-label="图文阅读器正在启动">
+    <section class="brand">
+      <div class="brand-mark" aria-hidden="true"><img src="../../build/icon.png" alt=""></div>
+      <h1>图文阅读器</h1>
+    </section>
+    <section class="status" aria-live="polite">
+      <div class="status-line"><span id="splashStatus">正在启动</span><span id="splashPercent">4%</span></div>
+      <div class="progress-track" aria-hidden="true"><span id="splashProgress"></span></div>
+    </section>
+  </main>
+  <script>
+    window.__setSplashState = (state) => {
+      const percent = Math.max(0, Math.min(100, Math.round(Number(state?.percent || 0) * 100)));
+      document.documentElement.dataset.theme = state?.theme === 'light' ? 'light' : 'dark';
+      document.querySelector('#splashStatus').textContent = typeof state?.text === 'string' && state.text ? state.text : '正在启动';
+      document.querySelector('#splashPercent').textContent = `${percent}%`;
+      document.querySelector('#splashProgress').style.width = `${Math.max(4, percent)}%`;
+    };
+    window.__finishSplash = () => document.body.classList.add('closing');
+  </script>
+</body>
+</html>

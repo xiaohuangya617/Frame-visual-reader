@@ -1,50 +1,77 @@
-# 图文阅读器 2.7.0
+# Frame-visual-reader
 
-> Windows 免安装版，下载、解压后即可使用。
+Windows 图文阅读器，支持文字、电子书、PDF 和漫画压缩包的本地离线阅读。
 
-## 下载与运行
+## 小白用户：下载即用
 
-**[下载 Windows 免安装版（ZIP）](https://github.com/xiaohuangya617/graphic-text-reader/releases/download/v2.7.0/image-reader-v2.7.0-windows-x64.zip)**
+**[点击下载 Windows 版（约 167 MB）](https://github.com/xiaohuangya617/Frame-visual-reader/releases/download/v2.7.0/image-reader-v2.7.0-windows-x64.zip)**
 
 1. 下载上面的 ZIP 文件。
-2. 右键 ZIP，选择“解压到当前文件夹”或“全部解压”。
+2. 右键解压到一个完整的新文件夹。
 3. 打开解压后的文件夹，双击 `图文阅读器.exe`。
 
-首次启动会在程序文件夹旁自动创建 `data` 数据目录，用来保存合集、阅读进度和界面设置。若电脑中存在旧版本的“图文阅读数据文件”或“随机阅读数据文件”，程序会尝试把旧数据迁移到新目录。请把整个解压后的文件夹保留在可写位置，不要只复制 EXE 文件。
+程序运行需要保留解压后的整个文件夹，不能只复制 EXE 文件。首次启动会在程序同级目录创建 `data` 数据目录，用于保存书库、阅读进度和设置。
 
-## 主要功能
+## 已确认功能
 
-- 管理多个本地阅读合集，可添加目录或单个文件。
-- 扫描并阅读漫画压缩包：`ZIP/CBZ`、`RAR/CBR`、`7Z/CB7`。
-- 阅读纯文本：`TXT`，支持常见中文编码选择。
-- 阅读电子书：`EPUB`。
-- 阅读文档：`PDF`。
-- 显示压缩包内的 `JPG/JPEG/PNG/GIF/WEBP/BMP/AVIF` 图片。
-- 支持未读状态、阅读次数、喜欢标记、阅读位置保存、合集重命名和刷新扫描。
-- 支持漫画连续阅读或单页阅读、缩放和适配方式；PDF 支持连续/单页模式与缩放。
-- 支持 TXT 字体大小、护眼模式和深色/浅色界面。
-- 支持导入/恢复阅读数据，重命名文件后可尝试恢复阅读位置。
+- 阅读 TXT、EPUB、PDF 文件。
+- 阅读 ZIP、CBZ、RAR、CBR、7Z、CB7 漫画压缩包。
+- 管理多个书库和合集，扫描文件夹或单个文件。
+- 保存阅读进度、阅读历史、点赞和阅读状态。
+- 选择 TXT 文本编码，支持 PDF 分段读取和 EPUB 流式读取。
+- 漫画页面按需读取，支持阅读模式、缩放和布局设置。
+- 深色/亮色模式、文件重命名、移入回收站。
+- 数据备份与恢复。
+- 完全离线运行，不要求登录或联网。
 
-以上功能依据程序内置代码和界面文案确认；本次发布前已验证空数据目录能够启动并显示主窗口，未对每一种文件格式做真实样本的完整阅读验收。
+## 已知限制
 
-## 已知限制与缺陷
+- 当前发布构建面向 Windows x64，未提供 macOS 或 Linux 构建。
+- 本仓库提供源码；依赖安装和构建需要 Node.js 与 npm，并且首次安装需要联网下载依赖。
+- 不能只运行源码目录中的 HTML 文件；必须通过 Electron 启动。
+- 解压后的运行目录必须保持完整，删除运行库或资源文件会导致启动或部分格式读取失败。
+- 不同 TXT 编码、损坏文件、加密压缩包和特殊 PDF 的兼容性取决于文件本身，未对所有样本逐一验收。
+- RAR、7Z 等格式使用第三方运行库；具体格式支持受上游库能力和文件特性影响。
+- 本次验证包含源码结构、依赖锁定、JavaScript 语法和文件校验；不等同于对所有格式进行真实样本验收。
 
-- 当前仅提供 Windows x64 目录版，没有 macOS、Linux 或移动端版本。
-- 当前仓库只发布编译后的运行包，没有同步项目源代码；无法在仓库内重新构建。
-- ZIP 压缩包约 463 MB，下载和解压需要足够的磁盘空间。
-- 程序按便携方式把数据写入运行目录的 `data` 文件夹；若文件夹没有写入权限，启动会失败，请移动到可写位置。首次启动可能自动迁移本机旧版本数据。
-- 阅读内容必须是本机可访问的文件或目录，项目没有联网书库或在线下载功能。
-- 本次发布只完成了启动路径验收，未宣称所有压缩包、EPUB、PDF 和编码样本均已通过现场验收。
+## 源码运行
 
-## 运行组件与许可证
+目标平台为 Windows x64。请在项目根目录打开 PowerShell：
 
-本发布包包含 Electron/Chromium 运行时以及用于阅读和解压的第三方组件。作者原创的发布说明和元数据按 [MIT License](LICENSE) 提供；Electron、Chromium、PDF.js、EPUB.js、7-Zip、node-unrar-js、JSZip 等第三方组件继续按各自上游许可证执行，详见 [第三方组件声明](THIRD-PARTY-NOTICES.md) 以及压缩包内的 `LICENSE.electron.txt`、`LICENSES.chromium.html` 和依赖目录许可证文件。
+```powershell
+$env:npm_config_cache = Join-Path $PWD '.cache/npm'
+$env:ELECTRON_CACHE = Join-Path $PWD '.cache/electron'
+$env:ELECTRON_BUILDER_CACHE = Join-Path $PWD '.cache/electron-builder'
+npm.cmd ci
+npm.cmd start
+```
 
-GitHub 的语言统计可能为空：本仓库是二进制发布仓库，应用代码封装在 `app.asar` 中，没有以源码文件形式提交。技术栈说明仅用于识别运行组件，不代表仓库提供源代码。
+构建目录版程序：
 
-## 版本
+```powershell
+npm.cmd run build
+```
 
-- 当前版本：`2.7.0`
-- 发布标签：`v2.7.0`
-- 变更记录：[CHANGELOG.md](CHANGELOG.md)
+生成的程序位于 `release/2.7.0/win-unpacked/`，运行时需要整个 `win-unpacked` 文件夹。
 
+## 目录说明
+
+| 路径 | 用途 |
+| --- | --- |
+| `src/main` | Electron 主进程、书库、文件和压缩包处理 |
+| `src/preload` | 主进程与界面的安全通信接口 |
+| `src/renderer` | 阅读界面、交互和样式 |
+| `scripts` | PDF.js Worker 补丁、图标和目录版打包脚本 |
+| `build` | 应用图标资源 |
+
+## 版本与许可
+
+- 当前应用版本：`2.7.0`
+- 分发包版本：`1.0.0`
+- 作者原创代码按 [MIT License](LICENSE) 发布，版权署名为 `xhy`。
+- Electron、Vite、PDF.js、EPUB.js、7-Zip、node-unrar-js、chardet、iconv-lite、Lucide 等第三方组件仍按各自上游许可证执行，详见 [THIRD-PARTY-NOTICES.md](THIRD-PARTY-NOTICES.md)。
+- 本项目不声明拥有第三方组件、商标或其内容的版权。
+
+## 版本记录
+
+详见 [CHANGELOG.md](CHANGELOG.md)。源码文件校验值见 `SHA256SUMS.txt`。
