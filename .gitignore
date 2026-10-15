@@ -1,0 +1,9 @@
+# Release 二进制资产只上传到 GitHub Release，不提交到 Git 仓库。
+release-assets/
+*.zip
+
+# 本地运行数据和临时文件
+data/
+*.log
+.DS_Store
+
