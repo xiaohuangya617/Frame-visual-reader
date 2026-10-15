@@ -2,7 +2,7 @@
 
 Windows 图文阅读器，支持文字、电子书、PDF 和漫画压缩包的本地离线阅读。
 
-## 小白用户：下载即用
+## 下载即用
 
 **[点击下载 Windows 版（约 167 MB）](https://github.com/xiaohuangya617/Frame-visual-reader/releases/download/v2.7.0/image-reader-v2.7.0-windows-x64.zip)**
 
